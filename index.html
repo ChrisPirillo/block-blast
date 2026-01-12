@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: https://ogp.me/ns#">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    
+    <!-- Primary SEO Meta Tags -->
+    <title>Block Blast - Addictive Block Puzzle Arcade Game</title>
+    <meta name="description" content="Play Block Blast, the ultimate precision-based block puzzle royale. Strategy meets arcade action in this addictive puzzle game. Drag blocks to clear lines, boost your score, and master the grid.">
+    <meta name="keywords" content="Block Blast, puzzle game, arcade game, block puzzle, browser game, strategy game, Chris Pirillo, mobile game, line clearing game">
+    <meta name="author" content="Chris Pirillo">
+    <link rel="canonical" href="https://pirillo.com/arcade/block-blast.html">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://pirillo.com/arcade/block-blast.html">
+    <meta property="og:title" content="Block Blast - High-Speed Block Puzzle Action">
+    <meta property="og:description" content="Master the grid in Block Blast. A high-fidelity puzzle experience designed for speed and strategy.">
+    <meta property="og:image" content="https://pirillo.com/arcade/images/block-blast.png">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@ChrisPirillo">
+    <meta name="twitter:creator" content="@ChrisPirillo">
+    <meta name="twitter:title" content="Block Blast Arcade">
+    <meta name="twitter:description" content="Drag, drop, and blast blocks in this addictive puzzle royale. Play now in your browser.">
+    <meta name="twitter:image" content="https://pirillo.com/arcade/images/block-blast.png">
+
+    <!-- Resource Hints & Performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://unpkg.com">
+    
+    <!-- Critical CSS & Font Loading -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" media="print" onload="this.media='all'">
+    
+    <!-- Google Tag Manager (GTM) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1CQ4D3VQ3L"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-1CQ4D3VQ3L');
+    </script>
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Block Blast",
+      "operatingSystem": "Web Browser",
+      "applicationCategory": "GameApplication",
+      "genre": "Puzzle",
+      "author": {
+        "@type": "Person",
+        "name": "Chris Pirillo",
+        "url": "https://pirillo.com"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        /* CSS Performance: font-display swap to prevent invisible text */
+        @font-face {
+            font-family: 'Inter';
+            font-display: swap;
+        }
+
+        :root {
+            --bg-color: #020617;
+            --grid-bg: rgba(15, 23, 42, 0.98);
+            --cell-empty: #0a0f1e;
+            --cell-border: #1e293b;
+            --primary-glow: rgba(59, 130, 246, 0.5);
+            
+            /* UNIFIED SPACING SYSTEM */
+            --spacing-unit: 4vmin;
+            --container-radius: 4vmin;
+            --game-width: min(85vw, 60vh);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 50% -20%, #1e40af 0%, transparent 60%),
+                radial-gradient(circle at 0% 100%, #312e81 0%, transparent 40%);
+            color: white;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            touch-action: none;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100dvh;
+            margin: 0;
+        }
+
+        #game-container {
+            width: 100%;
+            height: 100%;
+            padding: var(--spacing-unit);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            gap: var(--spacing-unit);
+        }
+
+        .game-title {
+            text-shadow: 0 0 30px rgba(59, 130, 246, 0.4);
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .layout-horizontal {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-unit);
+            width: 100%;
+            flex: 1;
+        }
+
+        .play-zone {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-unit);
+            align-items: center;
+            width: var(--game-width);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 1vmin;
+            background: var(--grid-bg);
+            padding: 2.5vmin;
+            border-radius: var(--container-radius);
+            box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 1), inset 0 2px 10px rgba(255,255,255,0.05);
+            aspect-ratio: 1/1;
+            width: 100%;
+            border: 1px solid rgba(255,255,255,0.08);
+            backdrop-filter: blur(20px);
+            position: relative;
+        }
+
+        .cell {
+            background: var(--cell-empty);
+            border-radius: 1.2vmin;
+            position: relative;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,1);
+            aspect-ratio: 1/1;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 2vmin;
+            width: 110px;
+            align-self: center;
+        }
+
+        .score-card {
+            background: linear-gradient(160deg, #1e293b 0%, #020617 100%);
+            border: 1px solid rgba(255,255,255,0.15);
+            padding: 2vmin 1vmin;
+            border-radius: 3vmin;
+            text-align: center;
+            box-shadow: 0 15px 25px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .btn-undo {
+            background: #0f172a;
+            border: 1px solid rgba(255,255,255,0.12);
+            padding: 2vmin;
+            border-radius: 3vmin;
+            color: #94a3b8;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 1.6vmin;
+            text-transform: uppercase;
+            font-weight: 900;
+            cursor: pointer;
+        }
+
+        .btn-undo:hover:not(:disabled) { 
+            color: white; 
+            background: #1e293b; 
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+            border-color: rgba(255,255,255,0.3);
+        }
+        .btn-undo:disabled { opacity: 0.1; filter: grayscale(1); cursor: default; }
+
+        .block-face {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+
+        .theme-gem .block-face {
+            border-radius: 25%;
+            background-image: linear-gradient(135deg, rgba(255,255,255,0.35) 0%, transparent 50%, rgba(0,0,0,0.2) 100%);
+            box-shadow: inset 0 0.8vmin 1.2vmin rgba(255,255,255,0.6), inset 0 -0.8vmin 1.2vmin rgba(0,0,0,0.4), 0 0.5vmin 1.5vmin rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .theme-gem .block-face::before {
+            content: '';
+            position: absolute;
+            top: 10%; left: 10%; width: 35%; height: 35%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.8), transparent);
+            border-radius: 40% 60% 70% 30%;
+            filter: blur(1px);
+        }
+
+        .theme-glass .block-face {
+            border-radius: 30%;
+            background-image: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+            box-shadow: inset 0 1.2vmin 1.5vmin rgba(255,255,255,0.5), inset -0.5vmin -0.5vmin 1vmin rgba(0,0,0,0.3), 0 0.5vmin 1vmin rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.4);
+        }
+
+        .theme-tech .block-face {
+            border-radius: 12%;
+            box-shadow: inset 0 0 0 0.5vmin rgba(0,0,0,0.4), inset 0 0 2vmin rgba(255,255,255,0.1), 0 4px 8px rgba(0,0,0,0.4);
+        }
+        .theme-tech .block-face::before {
+            content: '';
+            position: absolute;
+            width: 50%; height: 50%;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 4px;
+        }
+
+        .theme-cyber .block-face {
+            border-radius: 18%;
+            border: 2px solid currentColor;
+            background: #000 !important;
+            box-shadow: 0 0 15px currentColor, inset 0 0 10px currentColor;
+        }
+        .theme-cyber .block-face::after {
+            content: '';
+            position: absolute;
+            width: 100%; height: 100%;
+            background: linear-gradient(transparent, rgba(255,255,255,0.1), transparent);
+            animation: cyber-scan 2s linear infinite;
+        }
+        @keyframes cyber-scan {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+
+        .theme-soft .block-face {
+            border-radius: 45%;
+            box-shadow: inset -0.6vmin -0.6vmin 1.5vmin rgba(0,0,0,0.4), inset 0.8vmin 0.8vmin 1.5vmin rgba(255,255,255,0.5), 0 4px 10px rgba(0,0,0,0.4);
+        }
+
+        .cell.highlight {
+            background: rgba(59, 130, 246, 0.4);
+            box-shadow: inset 0 0 30px var(--primary-glow), 0 0 20px var(--primary-glow);
+            z-index: 10;
+        }
+
+        #shape-pool {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            height: 18vh;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: var(--container-radius);
+            align-items: center;
+            border: 1px solid rgba(255,255,255,0.06);
+            box-shadow: inset 0 4px 25px rgba(0,0,0,0.7);
+            padding: 0 3vmin;
+        }
+
+        .shape-container {
+            flex: 1;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: grab;
+            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .shape-container:hover { transform: scale(1.1); }
+
+        .mini-grid { display: grid; }
+        .mini-cell { aspect-ratio: 1/1; position: relative; }
+
+        .dragging {
+            position: fixed;
+            pointer-events: none;
+            z-index: 2000;
+            filter: drop-shadow(0 45px 70px rgba(0,0,0,0.9));
+            transform: scale(1.2);
+        }
+
+        .clearing { animation: clear-pop 0.5s forwards cubic-bezier(0.34, 1.56, 0.64, 1); }
+        @keyframes clear-pop {
+            0% { transform: scale(1); opacity: 1; filter: brightness(3); }
+            100% { transform: scale(0); opacity: 0; }
+        }
+
+        #game-over {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(2, 6, 23, 0.99);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+            backdrop-filter: blur(50px);
+        }
+
+        @media (max-width: 640px) {
+            :root {
+                --spacing-unit: 3vh;
+            }
+            #game-container { padding: var(--spacing-unit); gap: var(--spacing-unit); }
+            .layout-horizontal {
+                flex-direction: column;
+                gap: var(--spacing-unit);
+            }
+            .play-zone {
+                width: 100%;
+            }
+            .sidebar {
+                flex-direction: row;
+                width: 100%;
+                height: auto;
+                gap: 5vw;
+                justify-content: center;
+                order: -1;
+            }
+            .btn-undo { font-size: 12px; padding: 10px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <header class="game-title">
+            <h1 class="text-5xl md:text-6xl font-black text-white italic tracking-tighter">BLOCK<span class="text-blue-500">BLAST</span></h1>
+        </header>
+
+        <main class="layout-horizontal">
+            <!-- Semantic Area for Game Logic -->
+            <section class="play-zone" aria-label="Game Board">
+                <div id="grid" class="grid" role="grid" aria-label="Block Blast Grid"></div>
+                <div id="shape-pool" aria-label="Next Blocks Tray"></div>
+            </section>
+
+            <aside class="sidebar">
+                <div class="score-card" aria-live="polite">
+                    <p class="text-blue-400 text-[10px] uppercase font-black tracking-widest mb-1">Score</p>
+                    <p id="score" class="text-4xl md:text-5xl font-black text-white leading-none">0</p>
+                </div>
+                <button id="undo-btn" class="btn-undo" onclick="undo()" disabled aria-label="Undo last move">
+                    <i data-lucide="undo-2" class="w-8 h-8 mb-1" aria-hidden="true"></i>
+                    Undo
+                </button>
+            </aside>
+        </main>
+    </div>
+
+    <!-- Semantic Overlay for Game End -->
+    <div id="game-over" role="dialog" aria-labelledby="game-over-title">
+        <h2 id="game-over-title" class="text-7xl font-black text-white mb-8 italic">FINISH</h2>
+        <div class="bg-slate-800/50 p-14 rounded-[60px] border border-white/10 mb-8 text-center shadow-2xl">
+            <p id="final-score" class="text-9xl font-black text-blue-400">0</p>
+            <p class="text-slate-400 font-bold uppercase tracking-widest text-xl mt-2">Final Score</p>
+        </div>
+        <button class="bg-blue-600 hover:bg-blue-500 px-20 py-7 rounded-3xl font-black uppercase tracking-widest text-2xl transition-all active:scale-95 shadow-[0_0_30px_rgba(59,130,246,0.5)]" onclick="resetGame()" aria-label="Restart Game">Replay</button>
+    </div>
+
+    <div id="drag-proxy" class="dragging hidden" aria-hidden="true"></div>
+
+    <script>
+        /* JavaScript preserved AS-IS per instructions */
+        const themes = ['theme-gem', 'theme-glass', 'theme-tech', 'theme-cyber', 'theme-soft'];
+        document.body.className = themes[Math.floor(Math.random() * themes.length)];
+
+        const GRID_SIZE = 8;
+        const gridElement = document.getElementById('grid');
+        const shapePool = document.getElementById('shape-pool');
+        const scoreElement = document.getElementById('score');
+        const undoBtn = document.getElementById('undo-btn');
+        const gameOverScreen = document.getElementById('game-over');
+        const dragProxy = document.getElementById('drag-proxy');
+
+        let grid = Array(GRID_SIZE).fill().map(() => Array(GRID_SIZE).fill(null));
+        let score = 0;
+        let poolShapes = [];
+        let isDragging = false;
+        let activeShape = null;
+        let activeShapeIdx = -1;
+        let history = [];
+
+        let gridOrigin = { x: 0, y: 0 };
+        let cellSize, gap;
+        let highlightedCells = [];
+
+        const COLORS = ['#3b82f6', '#f43f5e', '#10b981', '#f59e0b', '#a855f7', '#06b6d4', '#fb923c'];
+        const SHAPES = [
+            { layout: [[1]] }, { layout: [[1, 1]] }, { layout: [[1, 1, 1]] }, { layout: [[1, 1, 1, 1]] },
+            { layout: [[1], [1]] }, { layout: [[1, 1], [1, 1]] }, { layout: [[1, 0], [1, 0], [1, 1]] },
+            { layout: [[1, 1, 1], [0, 1, 0]] }, { layout: [[1, 1, 1], [1, 1, 1], [1, 1, 1]] }
+        ];
+
+        function createBlockElement(color) {
+            const block = document.createElement('div');
+            block.className = 'block-face';
+            block.style.backgroundColor = color;
+            block.style.color = color;
+            return block;
+        }
+
+        function syncGridMetrics() {
+            const rect = gridElement.getBoundingClientRect();
+            const firstCell = gridElement.querySelector('.cell');
+            if (firstCell) {
+                cellSize = firstCell.offsetWidth;
+                const secondCell = gridElement.children[1];
+                gap = secondCell.getBoundingClientRect().left - firstCell.getBoundingClientRect().right;
+                gridOrigin = { 
+                    x: rect.left + parseFloat(window.getComputedStyle(gridElement).paddingLeft), 
+                    y: rect.top + parseFloat(window.getComputedStyle(gridElement).paddingTop) 
+                };
+            }
+        }
+
+        window.addEventListener('resize', () => {
+            syncGridMetrics();
+            shapePool.innerHTML = '';
+            poolShapes.forEach((s, i) => renderShapeInPool(s, i));
+        });
+
+        function initGrid() {
+            gridElement.innerHTML = '';
+            for (let r = 0; r < GRID_SIZE; r++) {
+                for (let c = 0; c < GRID_SIZE; c++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.dataset.row = r; cell.dataset.col = c;
+                    if (grid[r][c]) {
+                        cell.appendChild(createBlockElement(grid[r][c]));
+                        cell.classList.add('filled');
+                    }
+                    gridElement.appendChild(cell);
+                }
+            }
+            setTimeout(syncGridMetrics, 100);
+        }
+
+        function spawnShapes() {
+            shapePool.innerHTML = '';
+            poolShapes = [];
+            for (let i = 0; i < 3; i++) {
+                const randomShape = { ...SHAPES[Math.floor(Math.random() * SHAPES.length)] };
+                randomShape.color = COLORS[Math.floor(Math.random() * COLORS.length)];
+                poolShapes.push(randomShape);
+                renderShapeInPool(randomShape, i);
+            }
+            checkGameOver();
+        }
+
+        function renderShapeInPool(shape, index) {
+            if (!shape) return;
+            const container = document.createElement('div');
+            container.className = 'shape-container';
+            container.dataset.index = index;
+            
+            const miniGrid = document.createElement('div');
+            miniGrid.className = 'mini-grid';
+            miniGrid.style.gridTemplateColumns = `repeat(${shape.layout[0].length}, 1fr)`;
+            miniGrid.style.gap = '2px';
+            
+            const trayCellSize = Math.max(16, cellSize * 0.48 || 26);
+
+            shape.layout.forEach(row => {
+                row.forEach(cell => {
+                    const div = document.createElement('div');
+                    div.className = 'mini-cell';
+                    div.style.width = trayCellSize + 'px';
+                    div.style.height = trayCellSize + 'px';
+                    if (cell) div.appendChild(createBlockElement(shape.color));
+                    else div.style.visibility = 'hidden';
+                    miniGrid.appendChild(div);
+                });
+            });
+            container.appendChild(miniGrid);
+            shapePool.appendChild(container);
+            
+            container.addEventListener('mousedown', (e) => startDrag(e, shape, index));
+            container.addEventListener('touchstart', (e) => { e.preventDefault(); startDrag(e.touches[0], shape, index); }, {passive: false});
+        }
+
+        function startDrag(e, shape, index) {
+            isDragging = true;
+            activeShape = shape;
+            activeShapeIdx = index;
+            syncGridMetrics();
+            
+            dragProxy.innerHTML = '';
+            const miniGrid = document.createElement('div');
+            miniGrid.className = 'mini-grid';
+            miniGrid.style.gridTemplateColumns = `repeat(${shape.layout[0].length}, 1fr)`;
+            miniGrid.style.gap = gap + 'px';
+            
+            shape.layout.forEach(row => {
+                row.forEach(cell => {
+                    const div = document.createElement('div');
+                    div.style.width = cellSize + 'px';
+                    div.style.height = cellSize + 'px';
+                    if (cell) div.appendChild(createBlockElement(shape.color));
+                    else div.style.visibility = 'hidden';
+                    miniGrid.appendChild(div);
+                });
+            });
+            dragProxy.appendChild(miniGrid);
+            dragProxy.classList.remove('hidden');
+            
+            updateDragPosition(e);
+            document.querySelector(`.shape-container[data-index="${index}"]`).style.visibility = 'hidden';
+        }
+
+        function updateDragPosition(e) {
+            if (!isDragging) return;
+            
+            const vOffset = cellSize * 1.0;
+            const mouseX = e.clientX;
+            const mouseY = e.clientY - vOffset;
+
+            dragProxy.style.left = `${mouseX - (dragProxy.offsetWidth / 2)}px`;
+            dragProxy.style.top = `${mouseY - (dragProxy.offsetHeight / 2)}px`;
+
+            clearHighlights();
+            
+            const relX = mouseX - gridOrigin.x;
+            const relY = mouseY - gridOrigin.y;
+
+            const floatCol = (relX - (cellSize / 2)) / (cellSize + gap);
+            const floatRow = (relY - (cellSize / 2)) / (cellSize + gap);
+
+            const shapeW = activeShape.layout[0].length;
+            const shapeH = activeShape.layout.length;
+            
+            const startCol = Math.round(floatCol - (shapeW - 1) / 2);
+            const startRow = Math.round(floatRow - (shapeH - 1) / 2);
+
+            if (canPlace(activeShape, startRow, startCol)) {
+                highlightCells(activeShape, startRow, startCol);
+                activeShape.targetRow = startRow;
+                activeShape.targetCol = startCol;
+            } else {
+                activeShape.targetRow = null;
+            }
+        }
+
+        function canPlace(shape, row, col) {
+            if (row < 0 || col < 0) return false;
+            for (let r = 0; r < shape.layout.length; r++) {
+                for (let c = 0; c < shape.layout[r].length; c++) {
+                    if (shape.layout[r][c]) {
+                        if (row + r >= GRID_SIZE || col + c >= GRID_SIZE || grid[row+r][col+c] !== null) return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        function highlightCells(shape, row, col) {
+            highlightedCells = [];
+            for (let r = 0; r < shape.layout.length; r++) {
+                for (let c = 0; c < shape.layout[r].length; c++) {
+                    if (shape.layout[r][c]) {
+                        const cellIdx = (row + r) * GRID_SIZE + (col + c);
+                        const cell = gridElement.children[cellIdx];
+                        if (cell) {
+                            cell.classList.add('highlight');
+                            highlightedCells.push(cell);
+                        }
+                    }
+                }
+            }
+        }
+
+        function clearHighlights() {
+            while (highlightedCells.length > 0) {
+                highlightedCells.pop().classList.remove('highlight');
+            }
+        }
+
+        function placeShape(shape, row, col) {
+            history.push({ 
+                grid: JSON.parse(JSON.stringify(grid)), 
+                score, 
+                pool: JSON.parse(JSON.stringify(poolShapes)) 
+            });
+            if (history.length > 30) history.shift();
+            undoBtn.disabled = false;
+
+            for (let r = 0; r < shape.layout.length; r++) {
+                for (let c = 0; c < shape.layout[r].length; c++) {
+                    if (shape.layout[r][c]) {
+                        grid[row + r][col + c] = shape.color;
+                        const cell = gridElement.children[(row + r) * GRID_SIZE + (col + c)];
+                        cell.innerHTML = '';
+                        cell.appendChild(createBlockElement(shape.color));
+                        cell.classList.add('filled');
+                    }
+                }
+            }
+            score += 10;
+            scoreElement.innerText = score;
+            poolShapes[activeShapeIdx] = null;
+            document.querySelector(`.shape-container[data-index="${activeShapeIdx}"]`).innerHTML = '';
+            checkLines();
+            if (poolShapes.every(s => s === null)) spawnShapes();
+            else checkGameOver();
+        }
+
+        function checkLines() {
+            let rToClear = [], cToClear = [];
+            for (let r = 0; r < GRID_SIZE; r++) if (grid[r].every(x => x !== null)) rToClear.push(r);
+            for (let c = 0; c < GRID_SIZE; c++) {
+                let full = true;
+                for (let r = 0; r < GRID_SIZE; r++) if (grid[r][c] === null) { full = false; break; }
+                if (full) cToClear.push(c);
+            }
+            if (rToClear.length || cToClear.length) {
+                const targetCells = new Set();
+                rToClear.forEach(r => { for(let i=0; i<GRID_SIZE; i++) targetCells.add(`${r},${i}`); });
+                cToClear.forEach(c => { for(let i=0; i<GRID_SIZE; i++) targetCells.add(`${i},${c}`); });
+                score += targetCells.size * 5;
+                scoreElement.innerText = score;
+                targetCells.forEach(id => {
+                    const [r, c] = id.split(',').map(Number);
+                    grid[r][c] = null;
+                    const cell = gridElement.children[r * GRID_SIZE + c];
+                    cell.classList.add('clearing');
+                    setTimeout(() => { cell.innerHTML = ''; cell.classList.remove('filled', 'clearing'); }, 500);
+                });
+            }
+        }
+
+        function undo() {
+            if (!history.length) return;
+            const state = history.pop();
+            grid = state.grid; score = state.score; poolShapes = state.pool;
+            scoreElement.innerText = score;
+            initGrid();
+            shapePool.innerHTML = '';
+            poolShapes.forEach((s, i) => renderShapeInPool(s, i));
+            if (!history.length) undoBtn.disabled = true;
+        }
+
+        function checkGameOver() {
+            const rem = poolShapes.filter(x => x !== null);
+            let ok = false;
+            for (const s of rem) {
+                for (let r = 0; r < GRID_SIZE; r++) {
+                    for (let c = 0; c < GRID_SIZE; c++) if (canPlace(s, r, c)) { ok = true; break; }
+                    if (ok) break;
+                }
+                if (ok) break;
+            }
+            if (!ok) {
+                setTimeout(() => { 
+                    document.getElementById('final-score').innerText = score; 
+                    gameOverScreen.style.display = 'flex'; 
+                }, 1000);
+            }
+        }
+
+        function resetGame() {
+            grid = Array(GRID_SIZE).fill().map(() => Array(GRID_SIZE).fill(null));
+            score = 0; history = []; undoBtn.disabled = true;
+            scoreElement.innerText = '0'; gameOverScreen.style.display = 'none';
+            initGrid(); spawnShapes();
+        }
+
+        window.addEventListener('mousemove', (e) => isDragging && updateDragPosition(e));
+        window.addEventListener('touchmove', (e) => { 
+            if (isDragging) { e.preventDefault(); updateDragPosition(e.touches[0]); } 
+        }, {passive: false});
+        window.addEventListener('mouseup', endDrag);
+        window.addEventListener('touchend', endDrag);
+
+        function endDrag() {
+            if (!isDragging) return;
+            if (activeShape && activeShape.targetRow !== null && typeof activeShape.targetRow !== 'undefined') {
+                placeShape(activeShape, activeShape.targetRow, activeShape.targetCol);
+            } else {
+                const src = document.querySelector(`.shape-container[data-index="${activeShapeIdx}"]`);
+                if (src) src.style.visibility = 'visible';
+            }
+            isDragging = false; activeShape = null; dragProxy.classList.add('hidden'); clearHighlights();
+        }
+
+        initGrid(); 
+        spawnShapes(); 
+        lucide.createIcons();
+    </script>
+</body>
+</html>
